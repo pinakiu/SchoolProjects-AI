@@ -30,40 +30,61 @@ class ComputerPlayer():
         if len(game.available_moves()) == 9:
             square = random.choice(game.available_moves())
         else:
-            square = self.minimax(game, self.letter)['position']
+            square = self.minimax(game, self.letter, -math.inf, math.inf)['position'] #when calling minimax, pass in alpha and beta
         return square
 
-    def minimax(self, state, player):
+    def minimax(self, state, player, alpha, beta): #added alpha beta as parameters 
         max_player = self.letter  # yourself
         other_player = 'O' if player == 'X' else 'X'
 
-        # first we want to check if the previous move is a winner
+        # Base cases for terminal states
         if state.current_winner == other_player:
-            return {'position': None, 'score': 1 * (state.num_empty_squares() + 1) if other_player == max_player else -1 * (
-                        state.num_empty_squares() + 1)}
+            return {'position': None, 'score': 1 * (state.num_empty_squares() + 1) if other_player == max_player else -1 * (state.num_empty_squares() + 1)}
         elif not state.empty_squares():
             return {'position': None, 'score': 0}
 
         if player == max_player:
-            best = {'position': None, 'score': -math.inf}  # each score should maximize
-        else:
-            best = {'position': None, 'score': math.inf}  # each score should minimize
-        for possible_move in state.available_moves():
-            state.make_move(possible_move, player)
-            sim_score = self.minimax(state, other_player)  # simulate a game after making that move
+            best = {'position': None, 'score': -math.inf}
+            for possible_move in state.available_moves(): 
+                #simulate each move by making a copy of the board and trying the move
+                state.make_move(possible_move, player)
+                sim_score = self.minimax(state, other_player, alpha, beta)
 
-            # undo move
-            state.board[possible_move] = ' '
-            state.current_winner = None
-            sim_score['position'] = possible_move  # this represents the move optimal next move
+                # make sure to undo the move
+                state.board[possible_move] = ' '
+                state.current_winner = None
 
-            if player == max_player:  # X is max player
+                #save score of possible move into dict
+                sim_score['position'] = possible_move
                 if sim_score['score'] > best['score']:
                     best = sim_score
-            else:
+
+                # Alpha-beta pruning - check if current best is greater than beta
+                alpha = max(alpha, best['score'])
+                if alpha >= beta:
+                    break
+
+            return best
+        else:
+            best = {'position': None, 'score': math.inf}
+            for possible_move in state.available_moves():
+
+                state.make_move(possible_move, player)
+                sim_score = self.minimax(state, other_player, alpha, beta)
+
+                state.board[possible_move] = ' '
+                state.current_winner = None
+
+                sim_score['position'] = possible_move
                 if sim_score['score'] < best['score']:
                     best = sim_score
-        return best
+
+                # Alpha-beta pruning
+                beta = min(beta, best['score'])
+                if beta <= alpha:
+                    break
+
+            return best
     
 class TicTacToe():
     def __init__(self):
