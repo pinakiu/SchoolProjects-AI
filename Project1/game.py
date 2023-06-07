@@ -1,5 +1,5 @@
 import time 
-from Project1.player import HumanPlayer, RandomComputerPlayer
+from player import HumanPlayer, GeniusComputerPlayer
 
 class TicTacToe:
     def __init__(self):
@@ -113,6 +113,6 @@ def play(game, x_player, o_player, print_game=True):
     
 if __name__ == '__main__':
     x_player = HumanPlayer('X')
-    o_player = RandomComputerPlayer('O')
+    o_player = GeniusComputerPlayer('O')
     t = TicTacToe()
     play(t, x_player, o_player, print_game=True)
