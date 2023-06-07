@@ -1,3 +1,9 @@
+'''
+Mahri Almazova
+Pinaki Upadhyay 
+06/07/2023
+Project 1
+'''
 import math
 import time
 import random
